@@ -139,15 +139,26 @@ open class Person {
     
     fileprivate var _job : Job? = nil
     open var job : Job? {
-        get { }
+        get {
+            let title = _job?.title
+            let type = _job?.type
+            return Job(title: title!, type: type!)
+        }
         set(value) {
+            _job = Job(title: (value?.title)!, type: (value?.type)!)
         }
     }
     
     fileprivate var _spouse : Person? = nil
     open var spouse : Person? {
-        get { }
+        get {
+            let firstName = _spouse?.firstName
+            let lastName = _spouse?.lastName
+            let age = _spouse?.age
+            return Person(firstName: firstName!, lastName: lastName!, age: age!)
+        }
         set(value) {
+            _spouse = Person(firstName: (value?.firstName)!, lastName: (value?.lastName)!, age: (value?.age)!)
         }
     }
     
@@ -158,6 +169,7 @@ open class Person {
     }
     
     open func toString() -> String {
+        return "[Person: firstName:\(firstName) lastName:\(lastName) age:\(age) job:\(job?.title ?? "nil") spouse:\(spouse?.toString() ?? "nil")]"
     }
 }
 
