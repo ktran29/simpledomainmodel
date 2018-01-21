@@ -106,12 +106,26 @@ open class Job {
     }
     
     public init(title : String, type : JobType) {
+        self.title = title
+        self.type = type
     }
     
     open func calculateIncome(_ hours: Int) -> Int {
+        switch type {
+        case .Hourly(let wages):
+            return Int(wages) * hours
+        case .Salary(let wages):
+            return wages
+        }
     }
     
     open func raise(_ amt : Double) {
+        switch type {
+        case .Hourly(let wages):
+            self.type = JobType.Hourly(wages + amt)
+        case .Salary(let wages):
+            self.type = JobType.Salary(wages + Int(amt))
+        }
     }
 }
 
