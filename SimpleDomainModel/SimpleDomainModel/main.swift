@@ -169,7 +169,7 @@ open class Person {
     }
     
     open func toString() -> String {
-        return "[Person: firstName:\(firstName) lastName:\(lastName) age:\(age) job:\(job?.title ?? "nil") spouse:\(spouse?.toString() ?? "nil")]"
+        return "[Person: firstName:\(firstName) lastName:\(lastName) age:\(age) job:\(job?.title ?? "nil") spouse:\(spouse?.firstName ?? "nil") \(spouse?.lastName ?? "nil")]"
     }
 }
 
@@ -180,12 +180,28 @@ open class Family {
     fileprivate var members : [Person] = []
     
     public init(spouse1: Person, spouse2: Person) {
+        if spouse1.spouse == nil && spouse2.spouse == nil {
+            spouse1.spouse = spouse2
+            spouse2.spouse = spouse1
+            members.append(spouse1)
+            members.append(spouse2)
+        }
     }
     
     open func haveChild(_ child: Person) -> Bool {
+        if members[0].age >= 21 || members[1].age >= 21 {
+            members.append(child)
+            return true
+        }
+        return false
     }
     
     open func householdIncome() -> Int {
+        var income = 0
+        for num in 0...members.count - 1 {
+            income += (members[num].job?.calculateIncome(2000))!
+        }
+        return income
     }
 }
 
