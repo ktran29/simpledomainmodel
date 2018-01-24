@@ -39,7 +39,7 @@ public struct Money {
             case "EUR":
                 self.amount *= 3
             case "CAN":
-                self.amount /= 4/10
+                self.amount = Int(Double(self.amount) * 0.4)
             default:
                 self.amount *= 2
             }
@@ -49,28 +49,28 @@ public struct Money {
             case "GBP":
                 self.amount /= 3
             case "CAN":
-                self.amount /= 6/5
+                self.amount = Int(Double(self.amount) / 1.2)
             default:
-                self.amount /= 3/2
+                self.amount = Int(Double(self.amount) / 1.5)
             }
             
         case "CAN":
             switch to {
             case "GBP":
-                self.amount *= 4/10
+                self.amount = Int(Double(self.amount) * 0.4)
             case "EUR":
-                self.amount *= 6/5
+                self.amount = Int(Double(self.amount) * 1.2)
             default:
-                self.amount /= 5/4
+                self.amount = Int(Double(self.amount) / 1.25)
             }
         default:
             switch to {
             case "GBP":
                 self.amount /= 2
             case "EUR":
-                self.amount *= 3/2
+                self.amount = Int(Double(self.amount) * 1.5)
             default:
-                self.amount *= 5/4
+                self.amount = Int(Double(self.amount) * 1.25)
             }
         }
         self.currency = to
@@ -113,7 +113,7 @@ open class Job {
     open func calculateIncome(_ hours: Int) -> Int {
         switch type {
         case .Hourly(let wages):
-            return Int(wages) * hours
+            return Int(wages * Double(hours))
         case .Salary(let wages):
             return wages
         }
@@ -140,25 +140,24 @@ open class Person {
     fileprivate var _job : Job? = nil
     open var job : Job? {
         get {
-            let title = _job?.title
-            let type = _job?.type
-            return Job(title: title!, type: type!)
+            return _job
         }
         set(value) {
-            _job = Job(title: (value?.title)!, type: (value?.type)!)
+            if value != nil {
+                _job = self.age >= 18 ? Job(title: value!.title, type: value!.type) : nil
+            }
         }
     }
     
     fileprivate var _spouse : Person? = nil
     open var spouse : Person? {
         get {
-            let firstName = _spouse?.firstName
-            let lastName = _spouse?.lastName
-            let age = _spouse?.age
-            return Person(firstName: firstName!, lastName: lastName!, age: age!)
+            return _spouse
         }
         set(value) {
-            _spouse = Person(firstName: (value?.firstName)!, lastName: (value?.lastName)!, age: (value?.age)!)
+            if value != nil {
+                _spouse = value!.age >= 18 && self.age >= 18 ? Person(firstName: value!.firstName, lastName: value!.lastName, age: value!.age) : nil
+            }
         }
     }
     
@@ -169,7 +168,8 @@ open class Person {
     }
     
     open func toString() -> String {
-        return "[Person: firstName:\(firstName) lastName:\(lastName) age:\(age) job:\(job?.title ?? "nil") spouse:\(spouse?.firstName ?? "nil") \(spouse?.lastName ?? "nil")]"
+        
+        return "[Person: firstName:\(firstName) lastName:\(lastName) age:\(age) job:\(_job?.title) spouse:\(_spouse?.firstName)]"
     }
 }
 
@@ -199,7 +199,10 @@ open class Family {
     open func householdIncome() -> Int {
         var income = 0
         for num in 0...members.count - 1 {
-            income += (members[num].job?.calculateIncome(2000))!
+            let job = members[num].job
+            if job != nil {
+                income += job!.calculateIncome(2000)
+            }
         }
         return income
     }
