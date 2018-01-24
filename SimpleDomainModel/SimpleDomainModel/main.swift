@@ -32,64 +32,68 @@ public struct Money {
         self.currency = currency
     }
     
-    public mutating func convert(_ to: String) -> Money {
+    public func convert(_ to: String) -> Money {
+        
+        var convertedAmount = 0
+        
         switch currency {
         case "GBP":
             switch to {
             case "EUR":
-                self.amount *= 3
+                convertedAmount = self.amount * 3
             case "CAN":
-                self.amount = Int(Double(self.amount) * 0.4)
+                convertedAmount = Int(Double(self.amount) * 0.4)
             default:
-                self.amount *= 2
+                convertedAmount = self.amount * 2
             }
             
         case "EUR":
             switch to {
             case "GBP":
-                self.amount /= 3
+                convertedAmount = self.amount / 3
             case "CAN":
-                self.amount = Int(Double(self.amount) / 1.2)
+                convertedAmount = Int(Double(self.amount) / 1.2)
             default:
-                self.amount = Int(Double(self.amount) / 1.5)
+                convertedAmount = Int(Double(self.amount) / 1.5)
             }
             
         case "CAN":
             switch to {
             case "GBP":
-                self.amount = Int(Double(self.amount) * 0.4)
+                convertedAmount = Int(Double(self.amount) * 0.4)
             case "EUR":
-                self.amount = Int(Double(self.amount) * 1.2)
+                convertedAmount = Int(Double(self.amount) * 1.2)
             default:
-                self.amount = Int(Double(self.amount) / 1.25)
+                convertedAmount = Int(Double(self.amount) / 1.25)
             }
         default:
             switch to {
             case "GBP":
-                self.amount /= 2
+                convertedAmount = self.amount / 2
             case "EUR":
-                self.amount = Int(Double(self.amount) * 1.5)
+                convertedAmount = Int(Double(self.amount) * 1.5)
             default:
-                self.amount = Int(Double(self.amount) * 1.25)
+                convertedAmount = Int(Double(self.amount) * 1.25)
             }
         }
-        self.currency = to
-        return self
+        return Money(amount: convertedAmount, currency: to)
     }
     
-    public mutating func add(_ to: Money) -> Money {
+    public func add(_ to: Money) -> Money {
+        var newMoney = Money(amount: self.amount, currency: self.currency)
         if(self.currency != to.currency) {
-            self = self.convert(to.currency)
+            newMoney = newMoney.convert(to.currency)
         }
-        self.amount += to.amount
-        return self
+        newMoney.amount += to.amount
+        return newMoney
     }
-    public mutating func subtract(_ from: Money) -> Money {
+    public func subtract(_ from: Money) -> Money {
+        var newMoney = Money(amount: self.amount, currency: self.currency)
         if(self.currency != from.currency) {
-            self = self.convert(from.currency)
+            newMoney = newMoney.convert(from.currency)
         }
-        self.amount -= from.amount
-        return self
+        newMoney.amount -= from.amount
+        return newMoney
     }
 }
 
@@ -169,7 +173,18 @@ open class Person {
     
     open func toString() -> String {
         
-        return "[Person: firstName:\(firstName) lastName:\(lastName) age:\(age) job:\(_job?.title) spouse:\(_spouse?.firstName)]"
+        var spouseName = "nil"
+        var jobName = "nil"
+        
+        if _spouse != nil {
+            spouseName = "\(_spouse!.firstName) \(_spouse!.lastName)"
+        }
+        
+        if _job != nil {
+            jobName = "\(_job!.title)"
+        }
+        
+        return "[Person: firstName:\(firstName) lastName:\(lastName) age:\(age) job:\(jobName) spouse:\(spouseName)]"
     }
 }
 
